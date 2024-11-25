@@ -1,7 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.responses import JSONResponse
 from pymongo import MongoClient
+from bson import Binary
+import os
 
 # MongoDB connection setup
 client = MongoClient("mongodb://localhost:27017")  # Replace with your MongoDB URI
