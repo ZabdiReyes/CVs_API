@@ -3,16 +3,25 @@ from fastapi.responses import HTMLResponse
 from fastapi.responses import JSONResponse
 from pymongo import MongoClient
 
-app = FastAPI()
+# MongoDB connection setup
+client = MongoClient("mongodb://localhost:27017")  # Replace with your MongoDB URI
+db = client['CurriculumsBD']
+pdfs_collection = db['PDFs']
 
-app.version = "0.0.1"
+# Define the endpoint to upload the PDF
+@app.post("/upload-pdf/")
+async def upload_pdf(file: UploadFile = File(...)):
+    # Read the uploaded PDF file
+    file_content = await file.read()
 
-@app.post('/cargar/', tags=['Push'])
+    # Store the PDF in MongoDB as binary data
+    pdf_data = {
+        "filename": file.filename,
+        "file_content": Binary(file_content)
+    }
 
-def post_cv_in_pdf(cv : int):
-    
-    return JSONResponse(content={"cv": cv}, status_code=200)
+    # Insert the data into MongoDB
+    result = pdfs_collection.insert_one(pdf_data)
 
-@app.exception_handler(404)
-async def not_found(request, exc):
-    return HTMLResponse(content='<h1>¡Error, Page not found!</h1>', status_code=404)
+    # Return success message with inserted ID
+    return {"message": "PDF uploaded successfully", "file_id": str(result.inserted_id)}
