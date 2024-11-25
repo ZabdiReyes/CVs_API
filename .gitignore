@@ -6,6 +6,10 @@ __pycache__/
 #Python config
 config.py
 
+# 
+*.txt
+*.pdf
+
 # C extensions
 *.so
 
